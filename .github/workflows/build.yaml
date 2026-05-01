@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: quay.io
-  IMAGE_NAME: vozerov/searchproxy
+  IMAGE_NAME: vasiliyozerov/searchproxy
 
 jobs:
   build:
