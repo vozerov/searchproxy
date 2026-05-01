@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: searchproxy-config
+data:
+  config.yaml: |
+    proxies:
+      - listen: ":5432"
+        target: "postgres:5432"
+      - listen: ":6379"
+        target: "redis:6379"
+    health:
+      listen: ":8081"

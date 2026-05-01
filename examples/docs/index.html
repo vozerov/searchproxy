@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Internal services</title>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; max-width: 720px; margin: 2em auto; padding: 0 1em; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #eee; }
+    th { background: #fafafa; }
+  </style>
+</head>
+<body>
+  <h1>Internal services</h1>
+  <p>This pod proxies the following TCP services. Connect to the listed local port from any container in the pod.</p>
+  <table>
+    <thead>
+      <tr><th>Local</th><th>Upstream</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>localhost:5432</code></td><td><code>postgres:5432</code></td><td>Primary database</td></tr>
+      <tr><td><code>localhost:6379</code></td><td><code>redis:6379</code></td><td>Cache</td></tr>
+    </tbody>
+  </table>
+</body>
+</html>

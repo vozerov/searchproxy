@@ -1,0 +1,11 @@
+# Minimal config — three proxies, default health endpoint on :8081.
+# Targets use short names; resolution falls back through the pod's
+# /etc/resolv.conf search list.
+
+proxies:
+  - listen: ":5432"
+    target: "postgres:5432"
+  - listen: ":6379"
+    target: "redis:6379"
+  - listen: ":9092"
+    target: "kafka-broker:9092"

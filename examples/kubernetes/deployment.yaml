@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searchproxy
+  labels:
+    app: searchproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: searchproxy
+  template:
+    metadata:
+      labels:
+        app: searchproxy
+    spec:
+      containers:
+        - name: searchproxy
+          image: quay.io/vozerov/searchproxy:latest
+          args: ["-config", "/etc/searchproxy/config.yaml"]
+          ports:
+            - { containerPort: 5432, name: postgres }
+            - { containerPort: 6379, name: redis }
+            - { containerPort: 8081, name: health }
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8081 }
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /readyz, port: 8081 }
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits:   { cpu: 500m, memory: 64Mi }
+          volumeMounts:
+            - name: config
+              mountPath: /etc/searchproxy
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: searchproxy-config

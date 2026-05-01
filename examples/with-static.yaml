@@ -1,0 +1,16 @@
+# Same as basic.yaml plus a static HTTP server for in-pod docs.
+# Health endpoint is moved off the default port to free :8081 for
+# whatever else you might want.
+
+proxies:
+  - listen: ":5432"
+    target: "postgres:5432"
+  - listen: ":6379"
+    target: "redis:6379"
+
+health:
+  listen: ":9090"
+
+static:
+  listen: ":8080"
+  dir: "/var/www/docs"
