@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-19
+
 ### Fixed
 - A side closing its connection is now passed on to the other side as FIN
   (and a reset or write error closes both). Previously the proxy waited for
