@@ -47,22 +47,41 @@ func proxy(listen, target string) {
 		if err != nil {
 			continue
 		}
-		go func() {
-			defer c.Close()
-			// net.Dial reads /etc/resolv.conf and honors the search list.
-			b, err := net.Dial("tcp", target)
-			if err != nil {
-				log.Printf("dial %s: %v", target, err)
-				return
-			}
-			defer b.Close()
-			var wg sync.WaitGroup
-			wg.Add(2)
-			go func() { defer wg.Done(); io.Copy(b, c) }()
-			go func() { defer wg.Done(); io.Copy(c, b) }()
-			wg.Wait()
-		}()
+		go handle(c, target)
 	}
+}
+
+func handle(c net.Conn, target string) {
+	defer func() { _ = c.Close() }()
+	// net.Dial reads /etc/resolv.conf and honors the search list.
+	b, err := net.Dial("tcp", target)
+	if err != nil {
+		log.Printf("dial %s: %v", target, err)
+		return
+	}
+	defer func() { _ = b.Close() }()
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() { defer wg.Done(); pipe(b, c) }()
+	go func() { defer wg.Done(); pipe(c, b) }()
+	wg.Wait()
+}
+
+// pipe passes src's EOF on to dst as FIN. Otherwise a backend closing an idle
+// connection stays invisible to the client, and a keepalive pool (nginx) keeps
+// reusing the dead connection until its read timeout.
+func pipe(dst, src net.Conn) {
+	if _, err := io.Copy(dst, src); err != nil {
+		// Reset or write error: tear down both sides so the other copy unblocks.
+		_ = dst.Close()
+		_ = src.Close()
+		return
+	}
+	if tc, ok := dst.(*net.TCPConn); ok {
+		_ = tc.CloseWrite()
+		return
+	}
+	_ = dst.Close()
 }
 
 func health(addr string) {
